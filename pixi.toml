@@ -14,7 +14,7 @@ scipy = ">=1.10"
 scikit-learn = ">=1.3"
 
 # Spatial transcriptomics tools
-sopa = ">=1.0"
+sopa = { version = ">=1.0", extras = ["cellpose", "stardist", "baysor", "wsi"] }
 # Note: Baysor is installed via Julia, see tasks below
 
 # Visualization and analysis
