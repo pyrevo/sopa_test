@@ -42,31 +42,28 @@ docker run --rm sopa-pipeline:latest sopa-pipeline
 
 ## 🔧 Usage
 
+### Using Your Own Data Files
+
+If you have spatial transcriptomics data on your local machine:
+
+```bash
+# Pull the container (one time only)
+docker pull ghcr.io/pyrevo/sopa_test/sopa-pipeline:latest
+
+# Run SOPA on your data
+# Replace /path/to/your/data with your actual data directory
+# Replace /path/to/results with where you want output saved
+
+docker run --rm \
+  -v /path/to/your/data:/data/input \
+  -v /path/to/results:/data/output \
+  ghcr.io/pyrevo/sopa_test/sopa-pipeline:latest \
+  run-sopa --configfile workflow/config/xenium/cellpose.yaml \
+  --config data_path=/data/input \
+  --config sdata_path=/data/output/analysis.zarr
+```
+
 ### Basic Pipeline Commands
-
-```bash
-# Show help and available configs
-docker run --rm sopa-pipeline:latest sopa-pipeline
-
-# Run SOPA pipeline with Xenium CellPose config
-docker run --rm -v $(pwd)/data:/data sopa-pipeline:latest \
-  run-sopa --configfile workflow/config/xenium/cellpose.yaml \
-  --config data_path=/data/input
-```
-
-### Working with Data
-
-```bash
-# Mount local data and run analysis
-docker run --rm -v $(pwd)/data:/data sopa-pipeline:latest \
-  run-sopa --configfile workflow/config/xenium/cellpose.yaml \
-  --config data_path=/data/input --cores 4
-
-# Run with custom output directory
-docker run --rm -v $(pwd)/data:/data sopa-pipeline:latest \
-  run-sopa --configfile workflow/config/xenium/cellpose.yaml \
-  --config data_path=/data/input --config sdata_path=/data/output/analysis.zarr
-```
 
 ### Available Config Files
 

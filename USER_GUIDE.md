@@ -4,32 +4,42 @@ This Docker container provides the complete SOPA spatial transcriptomics Snakema
 
 ## Quick Start
 
-### 1. Build the Container
+### 1. Get the Container
 
 ```bash
-# Clone the repository
-git clone https://github.com/pyrevo/sopa_test.git
-cd sopa_test
-
-# Build the SOPA pipeline container
-docker buildx build --platform linux/amd64 -t sopa-pipeline:latest . --load
+# Pull the pre-built container
+docker pull ghcr.io/pyrevo/sopa_test/sopa-pipeline:latest
 ```
 
-### 2. Test Installation
+### 2. Prepare Your Data
+
+Make sure your spatial transcriptomics data is accessible on your local machine. For example:
+- **Xenium**: The output directory from Xenium analyzer
+- **CosMx**: The output directory from CosMx analysis
+- **Visium HD**: The output directory from Space Ranger
+
+### 3. Run SOPA on Your Data
 
 ```bash
-# Check available commands and configs
-docker run --rm sopa-pipeline:latest sopa-pipeline
-```
+# Replace these paths with your actual directories:
+# /path/to/your/data = your spatial transcriptomics data directory
+# /path/to/results = where you want results saved
 
-### 3. Run Your First Analysis
-
-```bash
-# Run SOPA pipeline on your data
-docker run --rm -v $(pwd)/data:/data sopa-pipeline:latest \
+docker run --rm \
+  -v /path/to/your/data:/data/input \
+  -v /path/to/results:/data/output \
+  ghcr.io/pyrevo/sopa_test/sopa-pipeline:latest \
   run-sopa --configfile workflow/config/xenium/cellpose.yaml \
-  --config data_path=/data/input
+  --config data_path=/data/input \
+  --config sdata_path=/data/output/analysis.zarr
 ```
+
+### 4. Access Results
+
+After the pipeline completes, your results will be in `/path/to/results/`:
+- `analysis.zarr/` - SpatialData with processed results
+- `analysis.explorer/` - Interactive visualization files
+- `analysis_summary.html` - Quality metrics report
 
 ## Pipeline Overview
 
@@ -41,20 +51,54 @@ The SOPA Snakemake pipeline automates the complete spatial transcriptomics analy
 4. **Aggregation**: Count transcripts within segmented cells
 5. **Visualization**: Generate interactive explorer and reports
 
-## Directory Structure
+## Data Preparation
 
-Place your input files in these folders on your host machine:
+### Supported Data Types
+
+The SOPA pipeline supports multiple spatial transcriptomics platforms:
+
+#### Xenium Data
+- **Input**: Xenium analyzer output directory
+- **Contains**: `transcripts.parquet`, `cells.parquet`, morphology images, etc.
+- **Config**: `workflow/config/xenium/cellpose.yaml`
+
+#### CosMx Data
+- **Input**: CosMx analysis output directory  
+- **Contains**: `transcripts.csv`, `metadata_file.csv`, etc.
+- **Config**: `workflow/config/cosmx/cellpose.yaml`
+
+#### Visium HD Data
+- **Input**: Space Ranger output directory
+- **Contains**: `spatial/tissue_positions.parquet`, `filtered_feature_bc_matrix/`, etc.
+- **Config**: `workflow/config/visium_hd/stardist.yaml`
+
+### Directory Structure
+
+Your data directory should contain the raw files from your spatial transcriptomics platform. For example:
 
 ```
-your_project/
-├── data/
-│   ├── input/          # Your spatial transcriptomics data
-│   │                   # (Xenium output folder, CosMx files, etc.)
-│   ├── output/         # Analysis results (auto-created)
-│   └── results/        # Final results
+your_xenium_data/
+├── transcripts.parquet
+├── cells.parquet
+├── cell_boundaries.parquet
+├── morphology.ome.tif
+├── experiment.xenium
+└── ...
 ```
 
-These will be accessible at `/data/` inside the container.
+### Mounting Data to Container
+
+Use Docker volume mounts (`-v`) to make your local data accessible:
+
+```bash
+# Mount your data directory to /data/input inside container
+-v /Users/username/data/xenium_output:/data/input
+
+# Mount output directory to save results
+-v /Users/username/results:/data/output
+```
+
+**Important**: Use absolute paths, not relative paths like `~/data` or `./data`.
 
 ## Configuration Files
 
@@ -182,12 +226,32 @@ Check that your data path is correct and the files exist:
 ls -la data/input/
 ```
 
+### Pipeline fails with "No such file or directory"
+Check that your data path is correct and the files exist:
+```bash
+ls -la /path/to/your/data/
+```
+
 ### Segmentation parameters not working
 Verify your config file syntax:
 ```bash
 docker run --rm -v $(pwd)/my_config.yaml:/workspace/my_config.yaml sopa-pipeline:latest \
   python -c "import yaml; print(yaml.safe_load(open('/workspace/my_config.yaml')))"
 ```
+
+### Permission issues with mounted volumes
+Ensure your data directories have proper permissions:
+```bash
+# On macOS/Linux
+chmod -R 755 /path/to/your/data/
+
+# On Windows, ensure Docker has access to the drive/folder
+```
+
+### Container can't find my data files
+- Use **absolute paths** in volume mounts (not `~/` or `./`)
+- Ensure the data directory exists before running
+- Check that files aren't hidden or have special characters in names
 
 ## Getting Help
 
