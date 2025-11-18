@@ -15,6 +15,21 @@ docker pull ghcr.io/pyrevo/sopa_test/sopa-pipeline:latest
 
 Create a project folder and organize your files like this:
 
+```bash
+# Create your project directory
+mkdir my_sopa_project
+cd my_sopa_project
+
+# Create the required 'input' folder
+mkdir input
+
+# Copy your spatial transcriptomics data files to the input folder
+# For Xenium: transcripts.parquet, cells.parquet, morphology.ome.tif, etc.
+# For CosMx: transcripts.csv, metadata_file.csv, etc.
+cp /path/to/your/data/files/* input/
+```
+
+**Required directory structure:**
 ```
 /your/project/folder/
 ├── input/           # Put your spatial transcriptomics data here
@@ -225,13 +240,7 @@ Increase Docker memory in Docker Desktop settings (8GB+ recommended for large da
 ### Pipeline fails with "No such file or directory"
 Check that your data path is correct and the files exist:
 ```bash
-ls -la data/input/
-```
-
-### Pipeline fails with "No such file or directory"
-Check that your data path is correct and the files exist:
-```bash
-ls -la /path/to/your/data/
+ls -la /path/to/your/project/input/
 ```
 
 ### Segmentation parameters not working

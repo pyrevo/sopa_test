@@ -46,6 +46,25 @@ docker run --rm sopa-pipeline:latest sopa-pipeline
 
 If you have spatial transcriptomics data on your local machine:
 
+#### Step 1: Set up your project folder
+```bash
+# Create a project directory for your analysis
+mkdir my_sopa_analysis
+cd my_sopa_analysis
+
+# Create the required 'input' subfolder
+mkdir input
+```
+
+#### Step 2: Add your data files
+```bash
+# Copy your spatial transcriptomics files to the input folder
+# For Xenium: transcripts.parquet, cells.parquet, morphology.ome.tif, etc.
+# For CosMx: transcripts.csv, metadata_file.csv, etc.
+cp /path/to/your/data/* input/
+```
+
+#### Step 3: Pull and run the container
 ```bash
 # Pull the container (one time only)
 docker pull ghcr.io/pyrevo/sopa_test/sopa-pipeline:latest
