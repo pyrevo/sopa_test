@@ -1,5 +1,8 @@
 # macOS system files
 .DS_Store
+._.DS_Store
+**/.DS_Store
+**/._.DS_Store
 
 # History files
 .Rhistory
@@ -50,3 +53,26 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# Docker and pixi
+.pixi/
+pixi.lock
+*.log
+
+# Data directories
+data/input/*
+data/output/*
+results/*
+!data/input/.gitkeep
+!data/output/.gitkeep
+!results/.gitkeep
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/

@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  sopa-baysor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sopa-baysor:local
+    container_name: sopa-baysor-analysis
+    
+    # Mount local directories for data
+    volumes:
+      - ./data:/data
+      - ./scripts:/workspace/scripts
+      - ./configs:/workspace/configs
+      - ./results:/data/results
+    
+    # Environment variables
+    environment:
+      - JULIA_NUM_THREADS=auto
+      - OMP_NUM_THREADS=4
+      - OPENBLAS_NUM_THREADS=4
+    
+    # Keep container running
+    stdin_open: true
+    tty: true
+    
+    # For Jupyter access
+    ports:
+      - "8888:8888"
+    
+    # Resource limits (adjust based on your system)
+    deploy:
+      resources:
+        limits:
+          cpus: '8'
+          memory: 32G
+        reservations:
+          cpus: '4'
+          memory: 16G
+    
+    # Command to run on startup
+    command: pixi run bash
+
+  # Optional: Separate service for Jupyter
+  jupyter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: sopa-baysor:local
+    container_name: sopa-baysor-jupyter
+    volumes:
+      - ./data:/data
+      - ./notebooks:/workspace/notebooks
+      - ./results:/data/results
+    ports:
+      - "8888:8888"
+    command: pixi run jupyter

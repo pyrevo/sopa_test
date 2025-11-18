@@ -1,0 +1,102 @@
+[workspace]
+name = "sopa-baysor-benchmark"
+version = "0.1.0"
+description = "Benchmark environment for SOPA and Baysor spatial transcriptomics tools"
+channels = ["conda-forge", "bioconda"]
+platforms = ["linux-64"]
+
+[dependencies]
+# Python and core scientific stack
+python = ">=3.10,<3.12"
+numpy = ">=1.24"
+pandas = ">=2.0"
+scipy = ">=1.10"
+scikit-learn = ">=1.3"
+
+# Spatial transcriptomics tools
+sopa = ">=1.0"
+# Note: Baysor is installed via Julia, see tasks below
+
+# Visualization and analysis
+matplotlib = ">=3.7"
+seaborn = ">=0.12"
+scanpy = ">=1.9"
+squidpy = ">=1.3"
+
+# Spatial data handling
+geopandas = ">=0.14"
+shapely = ">=2.0"
+anndata = ">=0.10"
+
+# Image processing
+scikit-image = ">=0.21"
+opencv = ">=4.8"
+zarr = ">=2.16"
+
+# R and R packages for spatial analysis
+r-base = ">=4.3"
+r-seurat = ">=5.0"
+# r-spatialexperiment is not available in conda, install via BiocManager in R
+# r-biocmanager = "*"
+
+# Note: Julia is included in the Baysor Docker image
+
+# Workflow tools
+snakemake = ">=7.32"
+
+# Utilities
+jupyter = ">=1.0"
+jupyterlab = ">=4.0"
+
+[tasks]
+# Show available commands
+help = """
+    echo "Available commands:"
+    echo "  sopa --help          - Run SOPA segmentation"
+    echo "  baysor --help        - Run Baysor segmentation"
+    echo "  pixi run test-all    - Test both tools"
+    echo "  pixi run jupyter     - Start Jupyter Lab"
+"""
+
+# Run SOPA demo/test
+test-sopa = """
+    python -c "
+import sopa
+print('✓ SOPA imported successfully')
+print(f'SOPA version: {sopa.__version__}')
+"
+"""
+
+# Run Baysor test (Baysor from official Docker image)
+test-baysor = """
+    baysor --version
+"""
+
+# Run all tests
+test-all = { depends-on = ["test-sopa", "test-baysor"] }
+
+# Start Jupyter Lab
+jupyter = "jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root"
+
+# Example: Run SOPA segmentation
+run-sopa-example = """
+    python scripts/run_sopa.py --input /data/input --output /data/output
+"""
+
+# Example: Run Baysor segmentation
+run-baysor-example = """
+    baysor run \
+        --config /workspace/configs/baysor_config.toml \
+        -o /data/output/baysor \
+        /data/input/transcripts.csv \
+        :cell_id
+"""
+
+[feature.dev.dependencies]
+pytest = ">=7.4"
+black = ">=23.0"
+ruff = ">=0.1"
+
+[environments]
+default = { solve-group = "default" }
+dev = { features = ["dev"], solve-group = "default" }
