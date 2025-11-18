@@ -187,6 +187,35 @@ The SOPA pipeline generates:
 - **Reports**: `analysis_summary.html` - Analysis summary
 - **Segmentation Results**: Cell boundaries and transcript assignments
 
+## 🧪 Testing Dependencies
+
+To ensure all dependencies are properly included, run these tests:
+
+```bash
+# Test all dependencies are importable
+docker run --rm ghcr.io/pyrevo/sopa_test/sopa-pipeline:latest pixi run test-dependencies
+
+# Test SOPA pipeline configurations load correctly
+docker run --rm ghcr.io/pyrevo/sopa_test/sopa-pipeline:latest pixi run test-pipeline-configs
+
+# Test actual pipeline execution (dry run)
+docker run --rm -v $(pwd):/data ghcr.io/pyrevo/sopa_test/sopa-pipeline:latest \
+  run-sopa --configfile workflow/config/xenium/cellpose.yaml --dry-run
+```
+
+## 🔍 Dependency Verification
+
+To ensure we don't miss important dependencies, we:
+
+1. **Check SOPA's optional dependencies** in `pyproject.toml`
+2. **Include all segmentation backends**: CellPose, StarDist, Baysor, ProSeg
+3. **Test imports** of all critical packages
+4. **Validate config files** can be loaded
+5. **Run dry-run tests** of the pipeline
+6. **Monitor for runtime errors** during actual execution
+
+The container includes all SOPA extras: `sopa[cellpose,stardist,baysor,wsi]`
+
 ## 🛠 Troubleshooting
 
 ### M1 Mac Users
@@ -208,6 +237,15 @@ chmod -R 755 data/
 ```bash
 # Check available config options
 docker run --rm sopa-pipeline:latest cat workflow/config/example_commented.yaml
+```
+
+### Missing Dependencies
+If you encounter `ImportError` or `ModuleNotFoundError`:
+```bash
+# Test all dependencies
+docker run --rm sopa-pipeline:latest pixi run test-dependencies
+
+# Report the issue with the missing package name
 ```
 
 ## 📖 Documentation

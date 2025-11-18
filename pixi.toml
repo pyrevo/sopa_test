@@ -75,6 +75,52 @@ test-baysor = """
 # Run all tests
 test-all = { depends-on = ["test-sopa", "test-baysor"] }
 
+# Test all SOPA dependencies
+test-dependencies = """
+    python -c "
+import sys
+print('Testing SOPA dependencies...')
+
+# Core SOPA
+try:
+    import sopa
+    print('✓ SOPA core')
+except ImportError as e:
+    print('✗ SOPA core:', e)
+    sys.exit(1)
+
+# Segmentation backends
+backends = [
+    ('cellpose', 'CellPose'),
+    ('stardist', 'StarDist'), 
+    ('baysor', 'Baysor'),
+    ('torch', 'PyTorch'),
+    ('tensorflow', 'TensorFlow'),
+    ('spatialdata', 'SpatialData'),
+    ('scanpy', 'ScanPy'),
+    ('squidpy', 'SquidPy'),
+    ('geopandas', 'GeoPandas'),
+    ('anndata', 'AnnData'),
+    ('zarr', 'Zarr'),
+    ('opencv', 'OpenCV'),
+    ('numpy', 'NumPy'),
+    ('pandas', 'Pandas'),
+    ('scipy', 'SciPy'),
+    ('matplotlib', 'Matplotlib'),
+    ('seaborn', 'Seaborn'),
+]
+
+for module, name in backends:
+    try:
+        __import__(module)
+        print(f'✓ {name}')
+    except ImportError:
+        print(f'⚠ {name} not available')
+
+print('Dependency check complete!')
+"
+"""
+
 # Start Jupyter Lab
 jupyter = "jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root"
 
