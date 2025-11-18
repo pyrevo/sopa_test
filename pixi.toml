@@ -35,7 +35,6 @@ anndata = ">=0.10"
 
 # Image processing
 scikit-image = ">=0.21"
-opencv = ">=4.8"
 zarr = ">=2.16"
 
 # R and R packages for spatial analysis
