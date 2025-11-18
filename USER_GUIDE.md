@@ -147,7 +147,7 @@ run-sopa --configfile workflow/config/visium_hd/cellpose.yaml --config data_path
 ### Run Complete Pipeline
 
 ```bash
-docker run --rm -v $(pwd)/data:/data sopa-pipeline:latest \
+docker run --rm -v $(pwd):/data sopa-pipeline:latest \
   run-sopa --configfile workflow/config/xenium/cellpose.yaml \
   --config data_path=/data/input --cores 4
 ```
@@ -181,6 +181,30 @@ docker run --rm -v $(pwd):/data sopa-pipeline:latest \
 docker run --rm -v $(pwd):/data sopa-pipeline:latest \
   run-sopa --configfile workflow/config/xenium/cellpose.yaml \
   --config data_path=/data/input aggregate
+```
+
+### Interactive Usage
+
+For debugging or running multiple commands, start the container interactively:
+
+```bash
+# Start container with interactive shell
+docker run --rm -it -v $(pwd):/data ghcr.io/pyrevo/sopa_test/sopa-pipeline:latest bash
+
+# Now you're inside the container - you can run commands interactively:
+cd /workspace
+
+# Check your data
+ls -la /data/input/
+
+# Run SOPA pipeline
+run-sopa --configfile workflow/config/xenium/cellpose.yaml --config data_path=/data/input
+
+# Test different configurations
+run-sopa --configfile workflow/config/xenium/baysor.yaml --config data_path=/data/input --dry-run
+
+# Exit when done
+exit
 ```
 
 ## Advanced Configuration

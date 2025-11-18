@@ -95,6 +95,23 @@ docker run --rm \
     └── analysis_summary.html
 ```
 
+### Interactive Container Usage
+
+For more control, you can start the container interactively and run commands from inside:
+
+```bash
+# Start container with interactive shell
+docker run --rm -it -v $(pwd):/data ghcr.io/pyrevo/sopa_test/sopa-pipeline:latest bash
+
+# Now you're inside the container, run SOPA commands:
+cd /workspace
+run-sopa --configfile workflow/config/xenium/cellpose.yaml --config data_path=/data/input
+
+# Or explore the environment:
+ls /data/input/
+pixi run python --version
+```
+
 ### Basic Pipeline Commands
 
 ```bash
