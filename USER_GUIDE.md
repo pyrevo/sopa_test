@@ -11,23 +11,28 @@ This Docker container provides the complete SOPA spatial transcriptomics Snakema
 docker pull ghcr.io/pyrevo/sopa_test/sopa-pipeline:latest
 ```
 
-### 2. Prepare Your Data
+### 2. Organize Your Data
 
-Make sure your spatial transcriptomics data is accessible on your local machine. For example:
-- **Xenium**: The output directory from Xenium analyzer
-- **CosMx**: The output directory from CosMx analysis
-- **Visium HD**: The output directory from Space Ranger
+Create a project folder and organize your files like this:
+
+```
+/your/project/folder/
+├── input/           # Put your spatial transcriptomics data here
+│   ├── transcripts.parquet    # Xenium data
+│   ├── cells.parquet         # Xenium data
+│   └── morphology.ome.tif     # Xenium data
+│   # OR for CosMx:
+│   ├── transcripts.csv
+│   └── metadata_file.csv
+└── output/          # This will be created automatically with results
+```
 
 ### 3. Run SOPA on Your Data
 
 ```bash
-# Replace these paths with your actual directories:
-# /path/to/your/data = your spatial transcriptomics data directory
-# /path/to/results = where you want results saved
-
+# Replace /your/project/folder with your actual folder path
 docker run --rm \
-  -v /path/to/your/data:/data/input \
-  -v /path/to/results:/data/output \
+  -v /your/project/folder:/data \
   ghcr.io/pyrevo/sopa_test/sopa-pipeline:latest \
   run-sopa --configfile workflow/config/xenium/cellpose.yaml \
   --config data_path=/data/input \
@@ -36,7 +41,7 @@ docker run --rm \
 
 ### 4. Access Results
 
-After the pipeline completes, your results will be in `/path/to/results/`:
+After the pipeline completes, your results will be in `/your/project/folder/output/`:
 - `analysis.zarr/` - SpatialData with processed results
 - `analysis.explorer/` - Interactive visualization files
 - `analysis_summary.html` - Quality metrics report
@@ -91,11 +96,8 @@ your_xenium_data/
 Use Docker volume mounts (`-v`) to make your local data accessible:
 
 ```bash
-# Mount your data directory to /data/input inside container
--v /Users/username/data/xenium_output:/data/input
-
-# Mount output directory to save results
--v /Users/username/results:/data/output
+# Mount your project folder to /data inside container
+-v /Users/username/my_project:/data
 ```
 
 **Important**: Use absolute paths, not relative paths like `~/data` or `./data`.
@@ -138,7 +140,7 @@ docker run --rm -v $(pwd)/data:/data sopa-pipeline:latest \
 ### Dry Run (see what will happen)
 
 ```bash
-docker run --rm -v $(pwd)/data:/data sopa-pipeline:latest \
+docker run --rm -v $(pwd):/data sopa-pipeline:latest \
   run-sopa --configfile workflow/config/xenium/cellpose.yaml \
   --config data_path=/data/input --dry-run
 ```
@@ -146,22 +148,22 @@ docker run --rm -v $(pwd)/data:/data sopa-pipeline:latest \
 ### Custom Output Location
 
 ```bash
-docker run --rm -v $(pwd)/data:/data sopa-pipeline:latest \
+docker run --rm -v $(pwd):/data sopa-pipeline:latest \
   run-sopa --configfile workflow/config/xenium/cellpose.yaml \
   --config data_path=/data/input \
-  --config sdata_path=/data/output/my_analysis.zarr
+  --config sdata_path=/data/output/analysis.zarr
 ```
 
 ### Run Specific Steps Only
 
 ```bash
 # Only run segmentation
-docker run --rm -v $(pwd)/data:/data sopa-pipeline:latest \
+docker run --rm -v $(pwd):/data sopa-pipeline:latest \
   run-sopa --configfile workflow/config/xenium/cellpose.yaml \
   --config data_path=/data/input resolve_cellpose
 
 # Only run aggregation
-docker run --rm -v $(pwd)/data:/data sopa-pipeline:latest \
+docker run --rm -v $(pwd):/data sopa-pipeline:latest \
   run-sopa --configfile workflow/config/xenium/cellpose.yaml \
   --config data_path=/data/input aggregate
 ```
@@ -179,7 +181,7 @@ docker run --rm sopa-pipeline:latest \
 
 # Edit my_config.yaml with your parameters
 # Then run with your custom config
-docker run --rm -v $(pwd)/data:/data -v $(pwd)/my_config.yaml:/workspace/my_config.yaml sopa-pipeline:latest \
+docker run --rm -v $(pwd):/data -v $(pwd)/my_config.yaml:/workspace/my_config.yaml sopa-pipeline:latest \
   run-sopa --configfile /workspace/my_config.yaml --config data_path=/data/input
 ```
 
@@ -187,12 +189,12 @@ docker run --rm -v $(pwd)/data:/data -v $(pwd)/my_config.yaml:/workspace/my_conf
 
 ```bash
 # Use multiple cores for faster processing
-docker run --rm -v $(pwd)/data:/data sopa-pipeline:latest \
+docker run --rm -v $(pwd):/data sopa-pipeline:latest \
   run-sopa --configfile workflow/config/xenium/cellpose.yaml \
   --config data_path=/data/input --cores 8
 
 # Limit memory usage
-docker run --rm -v $(pwd)/data:/data sopa-pipeline:latest \
+docker run --rm -v $(pwd):/data sopa-pipeline:latest \
   run-sopa --configfile workflow/config/xenium/cellpose.yaml \
   --config data_path=/data/input --resources mem_mb=16000
 ```
@@ -235,7 +237,7 @@ ls -la /path/to/your/data/
 ### Segmentation parameters not working
 Verify your config file syntax:
 ```bash
-docker run --rm -v $(pwd)/my_config.yaml:/workspace/my_config.yaml sopa-pipeline:latest \
+docker run --rm -v $(pwd):/data -v $(pwd)/my_config.yaml:/workspace/my_config.yaml sopa-pipeline:latest \
   python -c "import yaml; print(yaml.safe_load(open('/workspace/my_config.yaml')))"
 ```
 

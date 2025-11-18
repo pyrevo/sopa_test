@@ -51,21 +51,47 @@ If you have spatial transcriptomics data on your local machine:
 docker pull ghcr.io/pyrevo/sopa_test/sopa-pipeline:latest
 
 # Run SOPA on your data
-# Replace /path/to/your/data with your actual data directory
-# Replace /path/to/results with where you want output saved
+# Replace /path/to/your/project with your working directory
+# Put your data in a subfolder called 'input'
+# Results will be saved in 'output' subfolder
 
 docker run --rm \
-  -v /path/to/your/data:/data/input \
-  -v /path/to/results:/data/output \
+  -v /path/to/your/project:/data \
   ghcr.io/pyrevo/sopa_test/sopa-pipeline:latest \
   run-sopa --configfile workflow/config/xenium/cellpose.yaml \
   --config data_path=/data/input \
   --config sdata_path=/data/output/analysis.zarr
 ```
 
+**Example directory structure:**
+```
+/path/to/your/project/
+├── input/           # Put your Xenium/CosMx data here
+│   ├── transcripts.parquet
+│   ├── cells.parquet
+│   └── ...
+└── output/          # Results will be created here
+    ├── analysis.zarr/
+    ├── analysis.explorer/
+    └── analysis_summary.html
+```
+
 ### Basic Pipeline Commands
 
-### Available Config Files
+```bash
+# Show help and available configs
+docker run --rm sopa-pipeline:latest sopa-pipeline
+
+# Run SOPA pipeline (mount your current directory)
+docker run --rm -v $(pwd):/data sopa-pipeline:latest \
+  run-sopa --configfile workflow/config/xenium/cellpose.yaml \
+  --config data_path=/data/input
+
+# Run with multiple cores for faster processing
+docker run --rm -v $(pwd):/data sopa-pipeline:latest \
+  run-sopa --configfile workflow/config/xenium/cellpose.yaml \
+  --config data_path=/data/input --cores 4
+```
 
 The container includes configs for multiple platforms:
 
@@ -82,18 +108,18 @@ The container includes configs for multiple platforms:
 ### Advanced Usage
 
 ```bash
-# Dry run to see what will be executed
-docker run --rm -v $(pwd)/data:/data sopa-pipeline:latest \
+# Dry run to see what will be executed (no actual processing)
+docker run --rm -v $(pwd):/data sopa-pipeline:latest \
   run-sopa --configfile workflow/config/xenium/cellpose.yaml \
   --config data_path=/data/input --dry-run
 
-# Run specific rule only
-docker run --rm -v $(pwd)/data:/data sopa-pipeline:latest \
+# Run specific rule only (e.g., just segmentation)
+docker run --rm -v $(pwd):/data sopa-pipeline:latest \
   run-sopa --configfile workflow/config/xenium/cellpose.yaml \
   --config data_path=/data/input resolve_cellpose
 
-# Use multiple cores
-docker run --rm -v $(pwd)/data:/data sopa-pipeline:latest \
+# Use multiple cores for faster processing
+docker run --rm -v $(pwd):/data sopa-pipeline:latest \
   run-sopa --configfile workflow/config/xenium/cellpose.yaml \
   --config data_path=/data/input --cores 8
 ```
