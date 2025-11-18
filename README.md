@@ -33,7 +33,7 @@ docker run --rm sopa-pipeline:latest sopa-pipeline
 ## 📦 What's Included
 
 - **SOPA Snakemake Pipeline**: Complete workflow with all segmentation methods
-- **Multiple Segmentation Options**: CellPose, Baysor, ProSeg, StarDist
+- **Multiple Segmentation Options**: CellPose (with GPU support), Baysor (config available), ProSeg, StarDist
 - **Spatial Data Formats**: Support for Xenium, CosMx, Visium HD, and more
 - **Analysis Stack**: scanpy, squidpy, geopandas, seaborn, numpy, pandas
 - **Pixi Environment**: Efficient Python/R package management
