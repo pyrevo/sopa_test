@@ -1,5 +1,5 @@
-# Main build: Ubuntu with SOPA Snakemake pipeline
-FROM ubuntu:22.04
+# Main build: Ubuntu with NVIDIA CUDA support for SOPA Snakemake pipeline
+FROM nvidia/cuda:12.6.0-base-ubuntu22.04
 
 # Prevent interactive prompts during package installation
 ENV DEBIAN_FRONTEND=noninteractive
@@ -69,10 +69,11 @@ pixi run snakemake -s workflow/Snakefile "$@"
 EOF
 RUN chmod +x /usr/local/bin/run-sopa
 
-# Set the default command to show help
+# Default command to show help
 CMD ["sopa-pipeline"]
 
 # Metadata
 LABEL maintainer="massimiliano.volpe@scilifelab.se"
-LABEL description="SOPA for spatial transcriptomics segmentation"
+LABEL description="SOPA for spatial transcriptomics segmentation with NVIDIA CUDA support"
 LABEL version="2.0"
+LABEL cuda.version="12.6"

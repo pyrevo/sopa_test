@@ -33,7 +33,7 @@ docker run --rm sopa-pipeline:latest sopa-pipeline
 ## 📦 What's Included
 
 - **SOPA Snakemake Pipeline**: Complete workflow with all segmentation methods
-- **Multiple Segmentation Options**: CellPose (with GPU support), Baysor (config available), ProSeg, StarDist
+- **Multiple Segmentation Options**: CellPose (with GPU support via NVIDIA CUDA), Baysor (config available), ProSeg, StarDist
 - **Spatial Data Formats**: Support for Xenium, CosMx, Visium HD, and more
 - **Analysis Stack**: scanpy, squidpy, geopandas, seaborn, numpy, pandas
 - **Pixi Environment**: Efficient Python/R package management
@@ -93,6 +93,19 @@ docker run --rm \
     ├── analysis.zarr/
     ├── analysis.explorer/
     └── analysis_summary.html
+```
+
+### GPU Support
+
+This container includes NVIDIA CUDA 12.6 support for GPU-accelerated CellPose segmentation:
+
+```bash
+# Run with GPU support (requires NVIDIA Docker runtime)
+docker run --rm --gpus all \
+  -v $(pwd):/data \
+  ghcr.io/pyrevo/sopa_test/sopa-pipeline:latest \
+  run-sopa --configfile workflow/config/xenium/cellpose.yaml \
+  --config data_path=/data/input
 ```
 
 ### Interactive Container Usage

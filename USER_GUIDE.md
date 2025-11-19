@@ -311,7 +311,7 @@ docker run --rm sopa-pipeline:latest cat workflow/config/example_commented.yaml
 ## Tools Included
 
 - **SOPA Snakemake Pipeline**: Complete analysis workflow
-- **Multiple Segmentation Methods**: CellPose (with GPU support), Baysor (config available), ProSeg, StarDist
+- **Multiple Segmentation Methods**: CellPose (with NVIDIA CUDA GPU support), Baysor (config available), ProSeg, StarDist
 - **Data Format Support**: Xenium, CosMx, Visium HD, MERSCOPE, etc.
 - **Python Scientific Stack**: numpy, pandas, scanpy, squidpy
 - **Snakemake**: Workflow management
