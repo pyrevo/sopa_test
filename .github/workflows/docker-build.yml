@@ -11,6 +11,8 @@ on:
       - 'sopa-workflow/**'
       - '.github/workflows/docker-build.yml'
   pull_request:
+    branches:
+      - main
     paths:
       - 'Dockerfile'
       - 'pixi.toml'

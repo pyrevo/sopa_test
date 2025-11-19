@@ -15,6 +15,7 @@ WORKDIR /workspace
 # - libgeos-dev: Geometry library for spatial operations
 # - libproj-dev: Cartographic projections
 # - wget: for downloading additional tools
+# - unzip: for extracting Baysor binary
 RUN apt-get update && apt-get install -y \
     curl \
     git \
@@ -23,6 +24,7 @@ RUN apt-get update && apt-get install -y \
     libgeos-dev \
     libproj-dev \
     wget \
+    unzip \
     && rm -rf /var/lib/apt/lists/*
 
 # Install pixi (cross-platform package manager)
@@ -34,6 +36,13 @@ COPY pixi.toml pixi.lock* ./
 
 # Install all dependencies via pixi (including Snakemake)
 RUN pixi install
+
+# Install Baysor (spatial segmentation tool)
+RUN cd /tmp && wget 'https://github.com/kharchenkolab/Baysor/releases/download/v0.7.1/baysor-x86_x64-linux-v0.7.1_build.zip' && \
+    unzip baysor-x86_x64-linux-v0.7.1_build.zip && \
+    mv ./bin/baysor/bin/baysor /usr/local/bin/baysor && \
+    rm -rf ./baysor-x86_x64-linux-v0.7.1_build.zip ./bin ./completions ./lib ./libexec ./share
+ENV PATH="/usr/local/bin:${PATH}"
 
 # Copy the SOPA workflow
 COPY sopa-workflow/workflow /workspace/workflow
