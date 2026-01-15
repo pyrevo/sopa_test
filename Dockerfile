@@ -1,4 +1,5 @@
-# Main build: Ubuntu with NVIDIA CUDA support for SOPA Snakemake pipeline
+# Use the official NVIDIA CUDA base image
+# This image is based on Ubuntu 22.04 and includes CUDA 12.6.0
 FROM nvidia/cuda:12.6.0-base-ubuntu22.04
 
 # Prevent interactive prompts during package installation
@@ -7,42 +8,70 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Set working directory
 WORKDIR /workspace
 
-# Install system dependencies
-# - curl: for downloading pixi and other tools
-# - git: for cloning repositories
-# - build-essential: C/C++ compilers needed by some packages
-# - libhdf5-dev: HDF5 support for data files
-# - libgeos-dev: Geometry library for spatial operations
-# - libproj-dev: Cartographic projections
-# - wget: for downloading additional tools
-# - unzip: for extracting Baysor binary
-RUN apt-get update && apt-get install -y \
-    curl \
-    git \
+# Install system dependencies required for SOPA and scientific computing
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    wget \
+    bzip2 \
+    libgl1 \
+    libglib2.0-0 \
     build-essential \
     libhdf5-dev \
     libgeos-dev \
     libproj-dev \
-    wget \
     unzip \
+    curl \
+    git \
+    python3 \
+    python3-pip \
+    python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install pixi (cross-platform package manager)
-RUN curl -fsSL https://pixi.sh/install.sh | bash
-ENV PATH="/root/.pixi/bin:${PATH}"
+# Install Python packages via pip
+RUN pip install --no-cache-dir \
+    numpy \
+    pandas \
+    scipy \
+    scikit-learn \
+    matplotlib \
+    seaborn \
+    geopandas \
+    shapely \
+    anndata \
+    zarr \
+    scanpy \
+    squidpy \
+    jupyter \
+    jupyterlab \
+    snakemake
 
-# Copy pixi configuration files
-COPY pixi.toml pixi.lock* ./
+# Install PyTorch with CUDA 12.6 support
+RUN pip install --no-cache-dir \
+    torch==2.6.0 \
+    torchvision==0.21.0 \
+    torchaudio==2.6.0 \
+    --index-url https://download.pytorch.org/whl/cu126
 
-# Install all dependencies via pixi (including Snakemake)
-RUN pixi install
+# Install SOPA and Cellpose
+RUN pip install --no-cache-dir \
+    sopa \
+    cellpose==3.1.0
 
-# Install Baysor (spatial segmentation tool)
-RUN cd /tmp && wget 'https://github.com/kharchenkolab/Baysor/releases/download/v0.7.1/baysor-x86_x64-linux-v0.7.1_build.zip' && \
-    unzip baysor-x86_x64-linux-v0.7.1_build.zip && \
-    mv ./bin/baysor/bin/baysor /usr/local/bin/baysor && \
-    rm -rf ./baysor-x86_x64-linux-v0.7.1_build.zip ./bin ./completions ./lib ./libexec ./share
-ENV PATH="/usr/local/bin:${PATH}"
+
+# Install Apptainer (Singularity) from official release
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    wget \
+    squashfs-tools \
+    libseccomp-dev \
+    uidmap \
+    fuse2fs \
+    cryptsetup \
+    runc \
+    libfuse3-3 \
+    fakeroot \
+    && rm -rf /var/lib/apt/lists/* \
+    && wget https://github.com/apptainer/apptainer/releases/download/v1.3.1/apptainer_1.3.1_amd64.deb \
+    && dpkg -i apptainer_1.3.1_amd64.deb \
+    && rm apptainer_1.3.1_amd64.deb
 
 # Copy the SOPA workflow
 COPY sopa-workflow/workflow /workspace/workflow
@@ -74,7 +103,7 @@ RUN chmod +x /usr/local/bin/sopa-pipeline
 RUN cat > /usr/local/bin/run-sopa << 'EOF'
 #!/bin/bash
 cd /workspace
-pixi run snakemake -s workflow/Snakefile "$@"
+snakemake -s workflow/Snakefile "$@"
 EOF
 RUN chmod +x /usr/local/bin/run-sopa
 

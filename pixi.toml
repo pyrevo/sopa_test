@@ -1,59 +1,14 @@
+# This file is no longer used - dependencies are now installed directly in Dockerfile
+# using conda/mamba and pip for better control and to avoid Julia conflicts
+
 [workspace]
 name = "sopa-baysor-benchmark"
 version = "0.1.0"
-description = "Benchmark environment for SOPA and Baysor spatial transcriptomics tools"
-channels = ["conda-forge", "bioconda", "pytorch"]
+description = "Benchmark environment for SOPA and Baysor spatial transcriptomics tools - NOW USING DOCKERFILE INSTEAD"
 platforms = ["linux-64"]
 
-[dependencies]
-# Python and core scientific stack
-python = ">=3.10,<3.12"
-numpy = ">=1.24"
-pandas = ">=2.0"
-scipy = ">=1.10"
-scikit-learn = ">=1.3"
-
-# Spatial transcriptomics tools
-sopa = ">=1.0"
-# NVIDIA/CUDA (for GPU support)
-cuda-version = "12.6"
-
-# CellPose dependencies
-cellpose = ">=3.0.5"
-pytorch = "2.6.0"
-torchvision = "0.21.0"
-torchaudio = "2.6.0"
-opencv = ">=4.8.0"
-
-# Visualization and analysis
-matplotlib = ">=3.7"
-seaborn = ">=0.12"
-scanpy = ">=1.9"
-squidpy = ">=1.3"
-
-# Spatial data handling
-geopandas = ">=0.14"
-shapely = ">=2.0"
-anndata = ">=0.10"
-
-# Image processing
-scikit-image = ">=0.21"
-zarr = ">=2.16"
-
-# R and R packages for spatial analysis
-r-base = ">=4.3"
-r-seurat = ">=5.0"
-# r-spatialexperiment is not available in conda, install via BiocManager in R
-# r-biocmanager = "*"
-
-# Note: Julia is included in the Baysor Docker image
-
-# Workflow tools
-snakemake = ">=7.32"
-
-# Utilities
-jupyter = ">=1.0"
-jupyterlab = ">=4.0"
+# All dependencies moved to Dockerfile for better control
+# Removed R/Seurat as they were not being used by the SOPA workflow
 
 [tasks]
 # Show available commands

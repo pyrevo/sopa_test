@@ -198,6 +198,16 @@ def _get_gene_column_argument(config: dict | str) -> str:
 
 def _copy_segmentation_config(path: Path | str, config: dict | str):
     """Copy the segmentation config to a file (`.json` or `.toml`).
+            apptainer_image = os.environ.get("BAYSOR_APPTAINER_IMAGE")
+            if not apptainer_image:
+                apptainer_image = "docker://vpetukhov/baysor:latest"
+            if apptainer_image:
+                polygon_format = "--polygon-format GeometryCollection"
+            else:
+                use_polygons_format_argument = _use_polygons_format_argument(baysor_executable_path)
+                polygon_format = (
+                    "--polygon-format GeometryCollection" if use_polygons_format_argument else "--save-polygons GeoJSON"
+                )
 
     Args:
         path: Where the config will be saved
